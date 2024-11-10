@@ -6,41 +6,27 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-public class Aufgaben
+//@Entity
+public abstract class Aufgaben
 {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@Id
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String ersteller;
+    //@Column(nullable = false)
+    private Personen ersteller;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String team;
 
-    @Column(nullable = false)
-    private Timestamp date;
+    //@Column(nullable = false)
+    private Timestamp date = new Timestamp(System.currentTimeMillis());
 
-    @Column(nullable = false)
-    private Timestamp lastUpdate;
-
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String titel;
 
-    @Column
-    private String beschreibung;
-
-    @Column(nullable = false)
-    private String status = "Auftrag erstellt";
-
-    @ManyToMany
-    @JoinTable(
-            name = "aufgaben_user",
-            joinColumns = @JoinColumn(name = "Aufgaben_id"),
-            inverseJoinColumns = @JoinColumn(name = "Personen_id")
-    )
-    private List<Personen> zugeordneteUser = new ArrayList<Personen>();
+    //@Column
+    protected String beschreibung;
 
     public Aufgaben(){}
 
@@ -54,7 +40,7 @@ public class Aufgaben
         return id;
     }
 
-    public String getErsteller()
+    public Personen getErsteller()
     {
         return ersteller;
     }
@@ -69,11 +55,6 @@ public class Aufgaben
         return date;
     }
 
-    public Timestamp getLastUpdate()
-    {
-        return lastUpdate;
-    }
-
     public String getTitel()
     {
         return titel;
@@ -84,23 +65,7 @@ public class Aufgaben
         return beschreibung;
     }
 
-    public String getStatus()
-    {
-        return status;
-    }
-
-    public List<Personen> getZugeordneteUser()
-    {
-        return zugeordneteUser;
-    }
-
-
-    public void setZugeordneteUser(List<Personen> zugeordneteUser)
-    {
-        this.zugeordneteUser = zugeordneteUser;
-    }
-
-    public void setErsteller(String ersteller)
+    public void setErsteller(Personen ersteller)
     {
         this.ersteller = ersteller;
     }
@@ -115,11 +80,6 @@ public class Aufgaben
         this.date = new Timestamp(System.currentTimeMillis());
     }
 
-    public void setLastUpdate()
-    {
-        this.lastUpdate = new Timestamp(System.currentTimeMillis());
-    }
-
     public void setTitel(String titel)
     {
         this.titel = titel;
@@ -127,14 +87,6 @@ public class Aufgaben
 
     public void setBeschreibung(String beschreibung)
     {
-        this.setLastUpdate();
         this.beschreibung = beschreibung;
     }
-
-    public void setStatus(String Status)
-    {
-        this.setLastUpdate();
-        this.status = status;
-    }
-
 }

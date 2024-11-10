@@ -5,25 +5,28 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-public abstract class Personen
+//@Entity
+public class Personen
 {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@Id
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    //@Column(unique = true, nullable = false)
     private String username;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String password;
 
-    @Column
+    //@Column
     private String team;
 
-    @ManyToMany(mappedBy = "Aufgaben")
-    private List<Aufgaben> anforderungen = new ArrayList<Aufgaben>();
+    //@Column
+    private String role;
+
+    //@ManyToMany(mappedBy = "Aufgaben")
+    private List<Aufgaben> Aufgaben = new ArrayList<Aufgaben>();
 
     public Personen(){}
 
@@ -61,5 +64,15 @@ public abstract class Personen
 
     public void setTeam(String team) {
         this.team = team;
+    }
+
+    public String getRole()
+    {
+        return role;
+    }
+
+    public void setRole(String role)
+    {
+        this.role = role;
     }
 }

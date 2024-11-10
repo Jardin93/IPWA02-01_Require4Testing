@@ -25,8 +25,8 @@ public class Personen
     //@Column
     private String role;
 
-    //@ManyToMany(mappedBy = "Aufgaben")
-    private List<Aufgaben> Aufgaben = new ArrayList<Aufgaben>();
+    //@Column
+    private List<Testfaelle> testfallListe = new ArrayList<Testfaelle>();
 
     public Personen(){}
 
@@ -74,5 +74,15 @@ public class Personen
     public void setRole(String role)
     {
         this.role = role;
+    }
+
+    public List<Testfaelle> getTestfallListe()
+    {
+        return testfallListe;
+    }
+
+    public void setTestfaelleListe(List<Testfaelle> testfallListe)
+    {
+        this.testfallListe = testfallListe;
     }
 }

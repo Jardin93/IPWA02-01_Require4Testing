@@ -1,9 +1,15 @@
 package ipwa02;
 
+import jakarta.enterprise.context.SessionScoped;
+import jakarta.inject.Named;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Service
+@Named("Service")
+@SessionScoped
+public class Service implements Serializable
 {
     private List<String> einAusgabeListe = new ArrayList<>();
     public List<String> setEinAusgabeListe() {
@@ -13,7 +19,7 @@ public class Service
         this.einAusgabeListe = einAusgabeListe;
     }
 
-    private Personen angemeldetePerson = null;
+    private Personen angemeldetePerson;
 
     public Personen getAngemeldetePerson()
     {
@@ -23,7 +29,7 @@ public class Service
     {
         this.angemeldetePerson = angemeldetePerson;
     }
-    public boolean istAngemeldet()
+    public boolean isLoggedIn()
     {
         return angemeldetePerson != null;
     }
@@ -47,7 +53,7 @@ public class Service
         // html element, welches alle Aufgaben mit Metadaten und optionen in einer HTML Table anzeigt
         return "";
     }
-    public String divAufgabeBearbeiten()
+    public String AufgabeSpeichern()
     {
         // html element, welches die zu bearbeitende Aufgabe in iframe lädt und die alten Werte in die eingabefelder vorlädt
         return "";
@@ -55,5 +61,18 @@ public class Service
     public void aufgabeSpeichern()
     {
         //wenn Aufgabe bereits existiert, dann überschreiben ansonsten neu anlegen. (einAusgabeListe nutzen)
+    }
+    public String getRolle()
+    {
+        if (angemeldetePerson == null) return "";
+        return angemeldetePerson.getRole();
+    }
+
+
+
+    //************************Simulierte Daten werden hier im Konstruktor erstellt*****************************
+    public Service()
+    {
+
     }
 }

@@ -1,9 +1,38 @@
 <html   xmlns="http://www.w3.org/1999/xhtml"
-        xmlns:h="http://xmlns.jcp.org/jsf/html">
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:p="http://primefaces.org/ui"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+>
     <h:head>
-        <title>Hello World</title>
+        <title>Require4Testing</title>
+        <link rel="icon" href="#{resource['images/home.png']}" type="image/png"/>
+        <h:outputStylesheet name="styles.css" />
     </h:head>
     <h:body>
-        <h:outputText value="Milch Kakao Erdnussbutter" />
+        <div class="card">
+            <p:menubar hideDelay="500" styleClass="nav-menu">
+                <f:facet name="start">
+                    <h:outputLink value="https://github.com/Jardin93/IPWA02-01_Require4Testing">
+                        <p:graphicImage name="images/github-mark.svg" styleClass="menu-logo" />
+                    </h:outputLink>
+                </f:facet>
+                <p:menuitem outcome="index" value="Home" icon="pi pi-home" />
+
+                <p:menuitem outcome="AnforderungHinzufügen" value="Anforderung erstellen" icon="pi pi-fw pi-plus" rendered="#{Service.rolle == 'Requirements Engineer'}"/>
+                <p:menuitem outcome="TestlaufHinzufügen" value="Testlauf erstellen" icon="pi pi-fw pi-plus" rendered="#{Service.rolle == 'Testmanager'}"/>
+                <p:menuitem outcome="TestfallHinzufügen" value="Testfall erstellen" icon="pi pi-fw pi-plus" rendered="#{Service.rolle == 'Testfallersteller'}"/>
+
+
+
+                <f:facet name="end">
+                    <p:button outcome="index" value="Login / Registrieren" icon="pi pi-fw pi-sign-in" styleClass="ui-button-info" rendered="#{!Service.loggedIn}"/>
+                    <p:commandButton action="#{Service.abmelden}" value="Logout" icon="pi pi-fw pi-sign-out" styleClass="ui-button-info" rendered="#{Service.loggedIn}" immediate="true"/>
+
+                </f:facet>
+            </p:menubar>
+        </div><br />
+        <h:outputText value="Test ob ich noch gerendert werde" /><br />
+        <h:outputText value="Ist angemeldet: #{Service.loggedIn}" /><br />
+        <h:outputText value="Test ob ich noch gerendert werde" /><br />
     </h:body>
 </html>

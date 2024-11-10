@@ -1,23 +1,25 @@
 package ipwa02;
 
+import jakarta.persistence.Column;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+//@Entity
 public class Testfaelle extends Aufgaben
 {
     //@Column
-    private List<Testschritte> testschritte = new ArrayList<Testschritte>();;
-
-    public List<Testschritte> getTestschritte()
+    private Anforderungen anforderung;
+    public Anforderungen getAnforderung()
     {
-        return testschritte;
+        return anforderung;
+    }
+    public void setAnforderung(Anforderungen anforderung)
+    {
+        this.anforderung = anforderung;
     }
 
-    public void setTestschritte(List<Testschritte> testschritte)
-    {
-        this.testschritte = testschritte;
-    }
 
     //@Column
     private Testlaeufe testlauf;
@@ -32,28 +34,18 @@ public class Testfaelle extends Aufgaben
         this.testlauf = testlauf;
     }
 
+    //@Column
+    private Personen tester;
 
-    /*
-    @ManyToMany
-    @JoinTable(
-            name = "aufgaben_user",
-            joinColumns = @JoinColumn(name = "Aufgaben_id"),
-            inverseJoinColumns = @JoinColumn(name = "Personen_id")
-    )*/
-    private List<Personen> zugeordneteUser = new ArrayList<Personen>();
-
-    public List<Personen> getZugeordneteUser()
+    public Personen getZugeordneteUser()
     {
-        return zugeordneteUser;
+        return tester;
     }
 
-
-    public void setZugeordneteUser(List<Personen> zugeordneteUser)
+    public void setZugeordneteUser(Personen tester)
     {
-        this.zugeordneteUser = zugeordneteUser;
+        this.tester = tester;
     }
-
-
 
 
     //@Column(nullable = false)
@@ -70,7 +62,18 @@ public class Testfaelle extends Aufgaben
         this.statusErgebnis = statusErgebnis;
     }
 
+    //@Column
+    private List<String> Testschritte;
 
+    public List<String> getTestschritte()
+    {
+        return Testschritte;
+    }
+
+    public void setTestschritte(List<String> testschritte)
+    {
+        this.Testschritte = testschritte;
+    }
 
     //@Column(nullable = false)
     private Timestamp lastUpdate = new Timestamp(System.currentTimeMillis());
@@ -91,4 +94,6 @@ public class Testfaelle extends Aufgaben
         this.setLastUpdate();
         this.beschreibung = beschreibung;
     }
+
+
 }

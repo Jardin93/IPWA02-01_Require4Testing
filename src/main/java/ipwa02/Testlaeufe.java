@@ -3,6 +3,7 @@ package ipwa02;
 import java.util.ArrayList;
 import java.util.List;
 
+//@Entity
 public class Testlaeufe extends Aufgaben
 {
     //@Column

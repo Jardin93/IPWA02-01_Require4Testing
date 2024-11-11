@@ -11,26 +11,28 @@
 </h:head>
 <h:body>
     <div class="card">
-        <p:menubar hideDelay="500" styleClass="nav-menu">
-            <f:facet name="start">
-                <h:outputLink value="https://github.com/Jardin93/IPWA02-01_Require4Testing">
-                    <p:graphicImage name="images/github-mark.svg" styleClass="menu-logo" />
-                </h:outputLink>
-            </f:facet>
-            <p:menuitem outcome="index" value="Home" icon="pi pi-home" />
+        <h:form>
+            <p:menubar hideDelay="500" styleClass="nav-menu">
+                <f:facet name="start">
+                    <h:outputLink value="https://github.com/Jardin93/IPWA02-01_Require4Testing">
+                        <p:graphicImage name="images/github-mark.svg" styleClass="menu-logo" />
+                    </h:outputLink>
+                </f:facet>
+                <p:menuitem outcome="index" value="Home" icon="pi pi-home" />
 
-            <p:menuitem outcome="AnforderungHinzufügen" value="Anforderung erstellen" icon="pi pi-fw pi-plus" rendered="#{Service.rolle == 'Requirements Engineer'}"/>
-            <p:menuitem outcome="TestlaufHinzufügen" value="Testlauf erstellen" icon="pi pi-fw pi-plus" rendered="#{Service.rolle == 'Testmanager'}"/>
-            <p:menuitem outcome="TestfallHinzufügen" value="Testfall erstellen" icon="pi pi-fw pi-plus" rendered="#{Service.rolle == 'Testfallersteller'}"/>
+                <p:menuitem outcome="AnforderungHinzufügen" value="Anforderung erstellen" icon="pi pi-fw pi-plus" rendered="#{Service.rolle == 'Requirements Engineer'}"/>
+                <p:menuitem outcome="TestlaufHinzufügen" value="Testlauf erstellen" icon="pi pi-fw pi-plus" rendered="#{Service.rolle == 'Testmanager'}"/>
+                <p:menuitem outcome="TestfallHinzufügen" value="Testfall erstellen" icon="pi pi-fw pi-plus" rendered="#{Service.rolle == 'Testfallersteller'}"/>
 
 
 
-            <f:facet name="end">
-                <p:button outcome="index" value="Login / Registrieren" icon="pi pi-fw pi-sign-in" styleClass="ui-button-info" rendered="#{!Service.loggedIn}"/>
-                <p:commandButton action="#{Service.abmelden}" value="Logout" icon="pi pi-fw pi-sign-out" styleClass="ui-button-info" rendered="#{Service.loggedIn}" immediate="true"/>
+                <f:facet name="end">
+                    <p:button outcome="LoginRegister" value="Login / Registrieren" icon="pi pi-fw pi-sign-in" styleClass="ui-button-info" rendered="#{!Service.loggedIn}"/>
+                    <p:commandButton action="#{Service.abmelden}" value="Logout" icon="pi pi-fw pi-sign-out" styleClass="ui-button-info" rendered="#{Service.loggedIn}"/>
 
-            </f:facet>
-        </p:menubar>
+                </f:facet>
+            </p:menubar>
+        </h:form>
     </div><br /><div class="card">
     <div class="grid">
         <div class="col-5 flex align-items-center justify-content-center">

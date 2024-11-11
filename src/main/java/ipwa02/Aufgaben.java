@@ -6,26 +6,27 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-//@Entity
+@Entity
 public abstract class Aufgaben
 {
-    //@Id
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //@Column(nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "ersteller_id")
     private Personen ersteller;
 
-    //@Column(nullable = false)
+    @Column(nullable = false)
     private String team;
 
-    //@Column(nullable = false)
+    @Column(nullable = false)
     private Timestamp date = new Timestamp(System.currentTimeMillis());
 
-    //@Column(nullable = false)
+    @Column(nullable = false)
     private String titel;
 
-    //@Column
+    @Column
     protected String beschreibung;
 
     public Aufgaben(){}

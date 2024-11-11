@@ -1,13 +1,14 @@
 package ipwa02;
 
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
 
 import java.util.List;
 
-//@Entity
+@Entity
 public class Anforderungen  extends Aufgaben
 {
-    //@Column
+
+    @OneToMany(mappedBy = "anforderung")
     private List<Testfaelle> testfall;
 
     public List<Testfaelle> getTestfall()

@@ -1,15 +1,16 @@
 package ipwa02;
 
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-//@Entity
+@Entity
 public class Testfaelle extends Aufgaben
 {
-    //@Column
+    @ManyToOne
+    @JoinColumn(name = "anforderung_id")
     private Anforderungen anforderung;
     public Anforderungen getAnforderung()
     {
@@ -21,7 +22,8 @@ public class Testfaelle extends Aufgaben
     }
 
 
-    //@Column
+    @ManyToOne
+    @JoinColumn(name = "testlauf_id")
     private Testlaeufe testlauf;
 
     public Testlaeufe getTestlauf()
@@ -34,21 +36,8 @@ public class Testfaelle extends Aufgaben
         this.testlauf = testlauf;
     }
 
-    //@Column
-    private Personen tester;
 
-    public Personen getZugeordneteUser()
-    {
-        return tester;
-    }
-
-    public void setZugeordneteUser(Personen tester)
-    {
-        this.tester = tester;
-    }
-
-
-    //@Column(nullable = false)
+    @Column(nullable = false)
     private String statusErgebnis = "Auftrag erstellt";
 
     public String getStatusErgebnis()
@@ -62,7 +51,9 @@ public class Testfaelle extends Aufgaben
         this.statusErgebnis = statusErgebnis;
     }
 
-    //@Column
+    @ElementCollection
+    @CollectionTable(name = "testschritte", joinColumns = @JoinColumn(name = "testfall_id"))
+    @Column(name = "schritt")
     private List<String> Testschritte;
 
     public List<String> getTestschritte()
@@ -75,7 +66,7 @@ public class Testfaelle extends Aufgaben
         this.Testschritte = testschritte;
     }
 
-    //@Column(nullable = false)
+    @Column(nullable = false)
     private Timestamp lastUpdate = new Timestamp(System.currentTimeMillis());
 
     public Timestamp getLastUpdate()

@@ -1,12 +1,14 @@
 package ipwa02;
 
+import jakarta.persistence.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
-//@Entity
+@Entity
 public class Testlaeufe extends Aufgaben
 {
-    //@Column
+    @OneToMany (mappedBy = "testlauf")
     private List<Testfaelle> testfaelle = new ArrayList<Testfaelle>();
 
     public List<Testfaelle> getTestfaelle()
@@ -17,5 +19,19 @@ public class Testlaeufe extends Aufgaben
     public void setTestfaelle(List<Testfaelle> testfaelle)
     {
         this.testfaelle = testfaelle;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "tester_id")
+    private Personen tester;
+
+    public Personen getZugeordneteUser()
+    {
+        return tester;
+    }
+
+    public void setZugeordneteUser(Personen tester)
+    {
+        this.tester = tester;
     }
 }

@@ -5,28 +5,25 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-//@Entity
+@Entity
 public class Personen
 {
 
-    //@Id
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //@Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String username;
 
-    //@Column(nullable = false)
+    @Column(nullable = false)
     private String password;
 
-    //@Column
+    @Column
     private String team;
 
-    //@Column
+    @Column
     private String role;
-
-    //@Column
-    private List<Testfaelle> testfallListe = new ArrayList<Testfaelle>();
 
     public Personen(){}
 
@@ -74,15 +71,5 @@ public class Personen
     public void setRole(String role)
     {
         this.role = role;
-    }
-
-    public List<Testfaelle> getTestfallListe()
-    {
-        return testfallListe;
-    }
-
-    public void setTestfaelleListe(List<Testfaelle> testfallListe)
-    {
-        this.testfallListe = testfallListe;
     }
 }

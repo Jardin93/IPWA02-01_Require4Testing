@@ -6,6 +6,7 @@
     <h:head>
         <title>Require4Testing</title>
         <link rel="icon" href="#{resource['images/home.png']}" type="image/png"/>
+        <h:outputStylesheet library="webjars" name="primeflex/3.3.1/primeflex.min.css" />
         <h:outputStylesheet name="styles.css" />
     </h:head>
     <h:body>
@@ -25,14 +26,22 @@
 
 
                 <f:facet name="end">
-                    <p:button outcome="index" value="Login / Registrieren" icon="pi pi-fw pi-sign-in" styleClass="ui-button-info" rendered="#{!Service.loggedIn}"/>
+                    <p:button outcome="LoginRegister" value="Login / Registrieren" icon="pi pi-fw pi-sign-in" styleClass="ui-button-info" rendered="#{!Service.loggedIn}"/>
                     <p:commandButton action="#{Service.abmelden}" value="Logout" icon="pi pi-fw pi-sign-out" styleClass="ui-button-info" rendered="#{Service.loggedIn}" immediate="true"/>
 
                 </f:facet>
             </p:menubar>
         </div><br />
-        <h:outputText value="Test ob ich noch gerendert werde" /><br />
-        <h:outputText value="Ist angemeldet: #{Service.loggedIn}" /><br />
-        <h:outputText value="Test ob ich noch gerendert werde" /><br />
+        <div class="card">
+            <div class="grid" >
+                <div class="col-2 flex align-items-center justify-content-center" />
+                <div class="col-8 flex align-items-center justify-content-center">
+                    <h:outputText value="Test ob ich noch gerendert werde" /><br />
+                    <h:outputText value="Ist angemeldet: #{Service.loggedIn}" /><br />
+                    <h:outputText value="Test ob ich noch gerendert werde" /><br />
+                </div>
+                <div class="col-2 flex align-items-center justify-content-center" />
+            </div>
+    </div>
     </h:body>
 </html>

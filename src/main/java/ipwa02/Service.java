@@ -12,7 +12,7 @@ import java.util.List;
 public class Service implements Serializable
 {
     private List<String> einAusgabeListe = new ArrayList<>();
-    public List<String> setEinAusgabeListe() {
+    public List<String> getEinAusgabeListe() {
         return einAusgabeListe;
     }
     public void setEinAusgabeListe(List<String> einAusgabeListe) {

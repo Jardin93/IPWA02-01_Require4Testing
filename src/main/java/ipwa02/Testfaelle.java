@@ -37,7 +37,7 @@ public class Testfaelle extends Aufgaben
     }
 
 
-    @Column(nullable = false)
+    @Column
     private String statusErgebnis = "Auftrag erstellt";
 
     public String getStatusErgebnis()
@@ -51,22 +51,20 @@ public class Testfaelle extends Aufgaben
         this.statusErgebnis = statusErgebnis;
     }
 
-    @ElementCollection
-    @CollectionTable(name = "testschritte", joinColumns = @JoinColumn(name = "testfall_id"))
-    @Column(name = "schritt")
-    private List<String> Testschritte;
+    @Column
+    private String testschritte;
 
-    public List<String> getTestschritte()
+    public String getTestschritte()
     {
-        return Testschritte;
+        return testschritte;
     }
 
-    public void setTestschritte(List<String> testschritte)
+    public void setTestschritte(String testschritte)
     {
-        this.Testschritte = testschritte;
+        this.testschritte = testschritte;
     }
 
-    @Column(nullable = false)
+    @Column
     private Timestamp lastUpdate = new Timestamp(System.currentTimeMillis());
 
     public Timestamp getLastUpdate()

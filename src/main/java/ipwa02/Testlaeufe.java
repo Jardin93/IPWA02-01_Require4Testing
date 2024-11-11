@@ -25,12 +25,12 @@ public class Testlaeufe extends Aufgaben
     @JoinColumn(name = "tester_id")
     private Personen tester;
 
-    public Personen getZugeordneteUser()
+    public Personen getTester()
     {
         return tester;
     }
 
-    public void setZugeordneteUser(Personen tester)
+    public void setTester(Personen tester)
     {
         this.tester = tester;
     }

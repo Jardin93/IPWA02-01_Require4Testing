@@ -29,7 +29,7 @@ public abstract class Aufgaben
     @Column
     protected String beschreibung;
 
-    public Aufgaben(){}
+    public Aufgaben(){date = new Timestamp(System.currentTimeMillis());}
 
     public void setId(Long id)
     {

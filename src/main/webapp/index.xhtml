@@ -29,7 +29,6 @@
                     <f:facet name="end">
                         <p:button outcome="LoginRegister" value="Login / Registrieren" icon="pi pi-fw pi-sign-in" styleClass="ui-button-info" rendered="#{!Service.loggedIn}"/>
                         <p:commandButton action="#{Service.abmelden}" value="Logout" icon="pi pi-fw pi-sign-out" styleClass="ui-button-info" rendered="#{Service.loggedIn}"/>
-
                     </f:facet>
                 </p:menubar>
             </h:form>
@@ -38,14 +37,9 @@
             <div class="grid" >
                 <div class="col-2 flex align-items-center justify-content-center" />
                 <div class="col-8 flex align-items-center justify-content-center">
-                    <h:outputText value="Test ob ich noch gerendert werde" /><br />
-                    <h:outputText value="Ist angemeldet: #{Service.loggedIn}" /><br />
-                    <h:outputText value="Ist angemeldet: #{Service.rolle}" /><br />
-                    <h:outputText value="Test ob ich noch gerendert werde" /><br />
-
                 </div>
                 <div class="col-2 flex align-items-center justify-content-center" />
             </div>
-    </div>
+        </div>
     </h:body>
 </html>

@@ -155,7 +155,10 @@ public class Service implements Serializable
     private List<Anforderungen> anforderungsListe = null;
     public List<Anforderungen> getAnforderungsListe()
     {
-        if (anforderungsListe == null) {initAnforderungsListe();}
+        if (anforderungsListe == null)
+        {
+            initAnforderungsListe();
+        }
         return anforderungsListe;
     }
     public void setAnforderungsListe(List<Anforderungen> anforderungsListe)
@@ -171,7 +174,10 @@ public class Service implements Serializable
     private List<SelectItem> stringAnforderungsTitelListe = null;
     public List<SelectItem> getStringAnforderungsTitelListe()
     {
-        if (stringAnforderungsTitelListe == null) {initStringAnforderungsTitelListe();}
+        if (stringAnforderungsTitelListe == null)
+        {
+            initStringAnforderungsTitelListe();
+        }
         return stringAnforderungsTitelListe;
     }
     public void setStringAnforderungsTitelListe(List<SelectItem> stringAnforderungsTitelListe)
@@ -180,43 +186,41 @@ public class Service implements Serializable
     }
     public void initStringAnforderungsTitelListe()
     {
-        stringtesterNamensListe = new ArrayList<>();
+        stringAnforderungsTitelListe = new ArrayList<>();
         for (Anforderungen a : getAnforderungsListe())
         {
-            stringtesterNamensListe.add(new SelectItem(a.getTitel()));
+            stringAnforderungsTitelListe.add(new SelectItem(a.getTitel()));
         }
     }
     public String testfallSpeichern()
     {
-        Testlaeufe testlauf = null;
+        Testfaelle testfall = null;
         if (!isLoggedIn() && einAusgabeListe.get(0) != "") {return "index.xhtml?faces-redirect=true";} //Ohne Titel nicht Speicherbar
         try //Testen ob die Aufgabe schon existiert und überschrieben werden muss
         {
-            testlauf = em.createQuery("SELECT p FROM Testlaeufe p WHERE p.titel = :titel AND p.team = :team", Testlaeufe.class)
+            testfall = em.createQuery("SELECT p FROM Testfaelle p WHERE p.titel = :titel AND p.team = :team", Testfaelle.class)
                     .setParameter("titel", einAusgabeListe.get(0))
                     .setParameter("team", einAusgabeListe.get(1))
                     .getSingleResult();
         }catch (Exception e) {}
-        if (testlauf == null) {testlauf = new Testlaeufe();} //wenn nicht existiert, dann neu erzeugen
-        testlauf.setTitel(einAusgabeListe.get(0));
-        testlauf.setBeschreibung(einAusgabeListe.get(1));
-        testlauf.setTeam(angemeldetePerson.getTeam());
-        testlauf.setErsteller(angemeldetePerson);
-        for (Personen p : getTesterListe())
+        if (testfall == null) {testfall = new Testfaelle();} //wenn nicht existiert, dann neu erzeugen
+        testfall.setTitel(einAusgabeListe.get(0));
+        testfall.setBeschreibung(einAusgabeListe.get(1));
+        testfall.setTeam(angemeldetePerson.getTeam());
+        testfall.setErsteller(angemeldetePerson);
+        for (Anforderungen a : getAnforderungsListe())
         {
-            String p_username = p.getUsername();
-            String uebergabeUsername = einAusgabeListe.get(2);
-            String zusammen = p_username + " " + uebergabeUsername;
-            if (Objects.equals(p.getUsername(), einAusgabeListe.get(2)))
+            if (Objects.equals(a.getTitel(), einAusgabeListe.get(2)))
             {
-                testlauf.setTester(p);
+                testfall.setAnforderung(a);
                 break;
             }
         }
-        testlauf.setTestfaelle(testfallpicker.getTarget());
+        testfall.setStatusErgebnis(einAusgabeListe.get(3));
+        testfall.setTestschritte(einAusgabeListe.get(4));
         try { //Aufgabe speichern
             em.getTransaction().begin();
-            em.persist(testlauf);
+            em.persist(testfall);
             em.getTransaction().commit();
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
@@ -294,9 +298,6 @@ public class Service implements Serializable
         testlauf.setErsteller(angemeldetePerson);
         for (Personen p : getTesterListe())
         {
-            String p_username = p.getUsername();
-            String uebergabeUsername = einAusgabeListe.get(2);
-            String zusammen = p_username + " " + uebergabeUsername;
             if (Objects.equals(p.getUsername(), einAusgabeListe.get(2)))
             {
                 testlauf.setTester(p);

@@ -2,8 +2,11 @@ package ipwa02;
 
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.context.FacesContext;
+import jakarta.faces.model.SelectItem;
 import jakarta.inject.Named;
 import jakarta.persistence.*;
+import org.primefaces.event.TransferEvent;
+import org.primefaces.model.DualListModel;
 
 import java.io.Serializable;
 import java.util.*;
@@ -12,130 +15,31 @@ import java.util.*;
 @SessionScoped
 public class Service implements Serializable
 {
-    private List<String> einAusgabeListe = new ArrayList<>();
+    /*******************************************************************************************************************
+    Attribute und Methoden für Generelle Aufgaben
+     *******************************************************************************************************************/
+    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("IPWA02_DB");
+    private EntityManager em = emf.createEntityManager();
+
+    private List<String> einAusgabeListe;
     public List<String> getEinAusgabeListe() {
         return einAusgabeListe;
     }
     public void setEinAusgabeListe(List<String> einAusgabeListe) {
         this.einAusgabeListe = einAusgabeListe;
     }
-
-    private List<Aufgaben> aufgaben;
-    private Aufgaben ausgewaehlteAufgabe;
-
-    public List<Aufgaben> getAufgaben() {
-        if (aufgaben == null) {
-            aufgaben = em.createQuery("SELECT a FROM Aufgaben a", Aufgaben.class).getResultList();
-        }
-        return aufgaben;
-    }
-
-    private List<Personen> testerListe;
-    public List<Personen> getTesterListe()
+    public void clearEinAusgabeListe()
     {
-        testerListe = em.createQuery("SELECT p FROM Personen p WHERE p.role = :rolle AND p.team = :team", Personen.class)
-                .setParameter("rolle", "Tester")
-                .setParameter("team", angemeldetePerson.getTeam())
-                .getResultList();
-        return testerListe;
-    }
-    private Map<String,String> StringtesterNamensListe = new HashMap<>();
-    public List<String> getStringtesterNamensListe()
-    {
-        List<String> ls = new ArrayList<>(StringtesterNamensListe.keySet());
-        return ls;
-    }
-
-    public void setStringtesterNamensListe()
-    {
-        for (Personen p : testerListe)
+        for (int i = 0; i < 10; i++)
         {
-            StringtesterNamensListe.put(p.getUsername(),p.getId().toString());
+            einAusgabeListe.set(i, "");
         }
     }
 
-    public String aufgabeBearbeiten(Aufgaben aufgabe) {
-        ausgewaehlteAufgabe = aufgabe;
-        return null;
-    }
 
-    public void aufgabeSpeichern() {
-        if (!isLoggedIn() && einAusgabeListe.get(0) != "") {return;}
-        try //Testen ob die Aufgabe schon existiert
-        {
-            ausgewaehlteAufgabe = em.createQuery("SELECT p FROM Anforderungen p WHERE p.titel = :titel AND p.team = :team", Anforderungen.class)
-                    .setParameter("titel", einAusgabeListe.get(0))
-                    .setParameter("team", einAusgabeListe.get(1))
-                    .getSingleResult();
-        }catch (Exception e) {}
-        switch (angemeldetePerson.getRole())
-        {
-            case "Requirements Engineer":
-                Anforderungen anforderung = new Anforderungen();
-                if (ausgewaehlteAufgabe != null) {anforderung = (Anforderungen) ausgewaehlteAufgabe;} //wenn schon existiert, dann überschreiben
-                anforderung.setTitel(einAusgabeListe.get(0));
-                anforderung.setBeschreibung(einAusgabeListe.get(1));
-                anforderung.setTeam(angemeldetePerson.getTeam());
-                anforderung.setErsteller(angemeldetePerson);
-                try { //Aufgabe speichern
-                    em.getTransaction().begin();
-                    em.persist(anforderung);
-                    em.getTransaction().commit();
-                } catch (Exception e) {
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback(); // Rollback bei Fehler
-                    }
-                }
-                break;
-            case "Testmanager":
-                Testlaeufe testlauf = new Testlaeufe();
-                if (ausgewaehlteAufgabe != null) {testlauf = (Testlaeufe) ausgewaehlteAufgabe;} //wenn schon existiert, dann überschreiben
-                testlauf.setTitel(einAusgabeListe.get(0));
-                testlauf.setBeschreibung(einAusgabeListe.get(1));
-                testlauf.setTeam(angemeldetePerson.getTeam());
-                testlauf.setErsteller(angemeldetePerson);
-                testlauf.setTester(em.find(Personen.class, einAusgabeListe.get(2)));
-                testlauf.setTestfaelle(IdListeZuAufgabenListe(einAusgabeListe.get(3),Testfaelle.class));
-                try { //Aufgabe speichern
-                    em.getTransaction().begin();
-                    em.persist(testlauf);
-                    em.getTransaction().commit();
-                } catch (Exception e) {
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback(); // Rollback bei Fehler
-                    }
-                }
-                break;
-            case "Testfallersteller":
-            case "Tester":
-                Testfaelle testfall = new Testfaelle();
-                if (ausgewaehlteAufgabe != null) {testfall = (Testfaelle) ausgewaehlteAufgabe;}
-                testfall.setTitel(einAusgabeListe.get(0));
-                testfall.setBeschreibung(einAusgabeListe.get(1));
-                testfall.setTeam(angemeldetePerson.getTeam());
-                testfall.setErsteller(angemeldetePerson);
-                testfall.setAnforderung(IdZuAufgabe(Long.parseLong(einAusgabeListe.get(2)), Anforderungen.class));
-                testfall.setTestschritte(einAusgabeListe.get(3)); //sind mit ";" getrennt
-                testfall.setStatusErgebnis(einAusgabeListe.get(4));
-                testfall.setTestlauf(IdZuAufgabe(Long.parseLong(einAusgabeListe.get(5)), Testlaeufe.class));
-                try { //Aufgabe speichern
-                    em.getTransaction().begin();
-                    em.persist(testfall);
-                    em.getTransaction().commit();
-                } catch (Exception e) {
-                    if (em.getTransaction().isActive()) {
-                        em.getTransaction().rollback(); // Rollback bei Fehler
-                    }
-                }
-                break;
-        }
-        ausgewaehlteAufgabe = null;
-        clearEinAusgabeListe();
-    }
-
-    private EntityManagerFactory emf = Persistence.createEntityManagerFactory("IPWA02_DB");
-    private EntityManager em = emf.createEntityManager();
-
+    /*******************************************************************************************************************
+    Userverwaltung
+     *******************************************************************************************************************/
     private Personen angemeldetePerson = null;
 
     public Personen getAngemeldetePerson()
@@ -207,55 +111,223 @@ public class Service implements Serializable
         clearEinAusgabeListe();
         return "index.xhtml?faces-redirect=true";
     }
-
     public String getRolle()
     {
         if (angemeldetePerson == null) return "";
         return angemeldetePerson.getRole();
     }
 
-    public void clearEinAusgabeListe()
+    /*******************************************************************************************************************
+    Speicher / Bearbeiten Anforderung
+     *******************************************************************************************************************/
+    public String AnforderungSpeichern()
     {
-        for (int i = 0; i < 10; i++)
+        Anforderungen anforderung = null;
+        if (!isLoggedIn() && einAusgabeListe.get(0) != "") {return "index.xhtml?faces-redirect=true";} //Ohne Titel nicht Speicherbar
+        try //Testen ob die Aufgabe schon existiert und überschrieben werden muss
         {
-            einAusgabeListe.set(i, (""));
-        }
-    }
-
-    public <T extends Aufgaben> T IdZuAufgabe(long id, Class <T> T)
-    {
-        try
-        {
-            return em.find(T, id);
+            anforderung = em.createQuery("SELECT p FROM Anforderungen p WHERE p.titel = :titel AND p.team = :team", Anforderungen.class)
+                    .setParameter("titel", einAusgabeListe.get(0))
+                    .setParameter("team", einAusgabeListe.get(1))
+                    .getSingleResult();
+        }catch (Exception e) {}
+        if (anforderung == null) {anforderung = new Anforderungen();} //wenn nicht existiert, dann neu erzeugen
+        anforderung.setTitel(einAusgabeListe.get(0));
+        anforderung.setBeschreibung(einAusgabeListe.get(1));
+        anforderung.setTeam(angemeldetePerson.getTeam());
+        anforderung.setErsteller(angemeldetePerson);
+        try { //Aufgabe speichern
+            em.getTransaction().begin();
+            em.persist(anforderung);
+            em.getTransaction().commit();
         } catch (Exception e) {
-            return null;
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback(); // Rollback bei Fehler
+            }
         }
+        clearEinAusgabeListe();
+        return "index.xhtml?faces-redirect=true";
     }
 
-    public <T extends Aufgaben> List<T> IdListeZuAufgabenListe(String ids, Class <T> T)
+    /*******************************************************************************************************************
+    Speicher / Bearbeiten Testfall
+     *******************************************************************************************************************/
+    private List<Anforderungen> anforderungsListe = null;
+    public List<Anforderungen> getAnforderungsListe()
     {
-        List<T> aufgabenListe = new ArrayList<T>();
-        for (String idString : ids.split(";"))
+        if (anforderungsListe == null) {initAnforderungsListe();}
+        return anforderungsListe;
+    }
+    public void setAnforderungsListe(List<Anforderungen> anforderungsListe)
+    {
+        this.anforderungsListe = anforderungsListe;
+    }
+    public void initAnforderungsListe()
+    {
+        anforderungsListe = em.createQuery("SELECT a FROM Anforderungen a WHERE a.team = :team", Anforderungen.class)
+                .setParameter("team", angemeldetePerson.getTeam())
+                .getResultList();
+    }
+    private List<SelectItem> stringAnforderungsTitelListe = null;
+    public List<SelectItem> getStringAnforderungsTitelListe()
+    {
+        if (stringAnforderungsTitelListe == null) {initStringAnforderungsTitelListe();}
+        return stringAnforderungsTitelListe;
+    }
+    public void setStringAnforderungsTitelListe(List<SelectItem> stringAnforderungsTitelListe)
+    {
+        this.stringAnforderungsTitelListe = stringAnforderungsTitelListe;
+    }
+    public void initStringAnforderungsTitelListe()
+    {
+        stringtesterNamensListe = new ArrayList<>();
+        for (Anforderungen a : getAnforderungsListe())
         {
-            try {
-                long id = Long.parseLong(idString);
-                T testfall = IdZuAufgabe(id, T);
-                if (testfall != null) {
-                    aufgabenListe.add((T) testfall);
-                }
-            } catch (NumberFormatException e) {}
+            stringtesterNamensListe.add(new SelectItem(a.getTitel()));
         }
-        return aufgabenListe;
+    }
+    public String testfallSpeichern()
+    {
+        Testlaeufe testlauf = null;
+        if (!isLoggedIn() && einAusgabeListe.get(0) != "") {return "index.xhtml?faces-redirect=true";} //Ohne Titel nicht Speicherbar
+        try //Testen ob die Aufgabe schon existiert und überschrieben werden muss
+        {
+            testlauf = em.createQuery("SELECT p FROM Testlaeufe p WHERE p.titel = :titel AND p.team = :team", Testlaeufe.class)
+                    .setParameter("titel", einAusgabeListe.get(0))
+                    .setParameter("team", einAusgabeListe.get(1))
+                    .getSingleResult();
+        }catch (Exception e) {}
+        if (testlauf == null) {testlauf = new Testlaeufe();} //wenn nicht existiert, dann neu erzeugen
+        testlauf.setTitel(einAusgabeListe.get(0));
+        testlauf.setBeschreibung(einAusgabeListe.get(1));
+        testlauf.setTeam(angemeldetePerson.getTeam());
+        testlauf.setErsteller(angemeldetePerson);
+        for (Personen p : getTesterListe())
+        {
+            String p_username = p.getUsername();
+            String uebergabeUsername = einAusgabeListe.get(2);
+            String zusammen = p_username + " " + uebergabeUsername;
+            if (Objects.equals(p.getUsername(), einAusgabeListe.get(2)))
+            {
+                testlauf.setTester(p);
+                break;
+            }
+        }
+        testlauf.setTestfaelle(testfallpicker.getTarget());
+        try { //Aufgabe speichern
+            em.getTransaction().begin();
+            em.persist(testlauf);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback(); // Rollback bei Fehler
+            }
+        }
+        clearEinAusgabeListe();
+        return "index.xhtml?faces-redirect=true";
     }
 
-    //************************Simulierte Daten werden hier im Konstruktor erstellt*****************************
+
+    /*******************************************************************************************************************
+    Speicher / Bearbeiten Testlauf
+     *******************************************************************************************************************/
+    private List<Personen> testerListe = null;
+    public List<Personen> getTesterListe()
+    {
+        if (testerListe != null) {return testerListe;}
+        testerListe = em.createQuery("SELECT p FROM Personen p WHERE p.role = :rolle AND p.team = :team", Personen.class)
+                .setParameter("rolle", "Tester")
+                .setParameter("team", angemeldetePerson.getTeam())
+                .getResultList();
+        return testerListe;
+    }
+    private DualListModel<Testfaelle> testfallpicker = null;
+    public DualListModel<Testfaelle> getTestfallpicker() {
+        if (testfallpicker == null) {initTestfallpicker();}
+        return testfallpicker;
+    }
+    public void setTestfallpicker(DualListModel<Testfaelle> testfallpicker)
+    {
+        this.testfallpicker = testfallpicker;
+    }
+    public void initTestfallpicker()
+    {
+        List<Testfaelle> source = em.createQuery("SELECT a FROM Testfaelle a WHERE a.team = :team", Testfaelle.class)
+                .setParameter("team", angemeldetePerson.getTeam())
+                .getResultList();
+        testfallpicker = new DualListModel<>(source,new ArrayList<>());
+    }
+    private List<SelectItem> stringtesterNamensListe = null;
+    public List<SelectItem> getStringtesterNamensListe()
+    {
+        if (stringtesterNamensListe == null) {initStringtesterNamensListe();}
+        return stringtesterNamensListe;
+    }
+    public void setStringtesterNamensListe(List<SelectItem> stringtesterNamensListe)
+    {
+        this.stringtesterNamensListe = stringtesterNamensListe;
+    }
+    public void initStringtesterNamensListe()
+    {
+        stringtesterNamensListe = new ArrayList<>();
+        stringtesterNamensListe.add(new SelectItem("keiner"));
+        for (Personen p : getTesterListe())
+        {
+            stringtesterNamensListe.add(new SelectItem(p.getUsername()));
+        }
+    }
+    public String TestlaufSpeichern()
+    {
+        Testlaeufe testlauf = null;
+        if (!isLoggedIn() && einAusgabeListe.get(0) != "") {return "index.xhtml?faces-redirect=true";} //Ohne Titel nicht Speicherbar
+        try //Testen ob die Aufgabe schon existiert und überschrieben werden muss
+        {
+            testlauf = em.createQuery("SELECT p FROM Testlaeufe p WHERE p.titel = :titel AND p.team = :team", Testlaeufe.class)
+                    .setParameter("titel", einAusgabeListe.get(0))
+                    .setParameter("team", einAusgabeListe.get(1))
+                    .getSingleResult();
+        }catch (Exception e) {}
+        if (testlauf == null) {testlauf = new Testlaeufe();} //wenn nicht existiert, dann neu erzeugen
+        testlauf.setTitel(einAusgabeListe.get(0));
+        testlauf.setBeschreibung(einAusgabeListe.get(1));
+        testlauf.setTeam(angemeldetePerson.getTeam());
+        testlauf.setErsteller(angemeldetePerson);
+        for (Personen p : getTesterListe())
+        {
+            String p_username = p.getUsername();
+            String uebergabeUsername = einAusgabeListe.get(2);
+            String zusammen = p_username + " " + uebergabeUsername;
+            if (Objects.equals(p.getUsername(), einAusgabeListe.get(2)))
+            {
+                testlauf.setTester(p);
+                break;
+            }
+        }
+        testlauf.setTestfaelle(testfallpicker.getTarget());
+        try { //Aufgabe speichern
+            em.getTransaction().begin();
+            em.persist(testlauf);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback(); // Rollback bei Fehler
+            }
+        }
+        clearEinAusgabeListe();
+        return "index.xhtml?faces-redirect=true";
+    }
+
+
+
+
+
+
+    //**************Simulierte Daten werden hier im Konstruktor erstellt (war vor einführung von Datenabnk)*************
+    //**************einAusgabeListe muss hier die maximale Anzahl an Felder für String übergaben initieren**************
     public Service()
     {
         einAusgabeListe = new ArrayList<>();
         // Initialisiere die Liste mit der Anzahl der benötigten Elementen
-        for (int i = 0; i < 10; i++)
-        {
-            einAusgabeListe.add("");
-        }
+        for (int i = 0; i < 10; i++) einAusgabeListe.add("");
     }
 }

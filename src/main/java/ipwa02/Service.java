@@ -18,6 +18,7 @@ public class Service implements Serializable
     /*******************************************************************************************************************
     Attribute und Methoden für Generelle Aufgaben
      *******************************************************************************************************************/
+    //region Generell
     private EntityManagerFactory emf = Persistence.createEntityManagerFactory("IPWA02_DB");
     private EntityManager em = emf.createEntityManager();
 
@@ -35,11 +36,12 @@ public class Service implements Serializable
             einAusgabeListe.set(i, "");
         }
     }
-
+    //endregion
 
     /*******************************************************************************************************************
     Userverwaltung
      *******************************************************************************************************************/
+    //region Userverwaltung
     private Personen angemeldetePerson = null;
 
     public Personen getAngemeldetePerson()
@@ -116,10 +118,12 @@ public class Service implements Serializable
         if (angemeldetePerson == null) return "";
         return angemeldetePerson.getRole();
     }
+    //endregion
 
     /*******************************************************************************************************************
     Speicher / Bearbeiten Anforderung
      *******************************************************************************************************************/
+    //region Anforderung
     public String AnforderungSpeichern()
     {
         Anforderungen anforderung = null;
@@ -148,29 +152,12 @@ public class Service implements Serializable
         clearEinAusgabeListe();
         return "index.xhtml?faces-redirect=true";
     }
+    //endregion
 
     /*******************************************************************************************************************
     Speicher / Bearbeiten Testfall
      *******************************************************************************************************************/
-    private List<Anforderungen> anforderungsListe = null;
-    public List<Anforderungen> getAnforderungsListe()
-    {
-        if (anforderungsListe == null)
-        {
-            initAnforderungsListe();
-        }
-        return anforderungsListe;
-    }
-    public void setAnforderungsListe(List<Anforderungen> anforderungsListe)
-    {
-        this.anforderungsListe = anforderungsListe;
-    }
-    public void initAnforderungsListe()
-    {
-        anforderungsListe = em.createQuery("SELECT a FROM Anforderungen a WHERE a.team = :team", Anforderungen.class)
-                .setParameter("team", angemeldetePerson.getTeam())
-                .getResultList();
-    }
+    //region Testfall
     private List<SelectItem> stringAnforderungsTitelListe = null;
     public List<SelectItem> getStringAnforderungsTitelListe()
     {
@@ -230,11 +217,12 @@ public class Service implements Serializable
         clearEinAusgabeListe();
         return "index.xhtml?faces-redirect=true";
     }
-
+    //endregion
 
     /*******************************************************************************************************************
     Speicher / Bearbeiten Testlauf
      *******************************************************************************************************************/
+    //region Testlauf
     private List<Personen> testerListe = null;
     public List<Personen> getTesterListe()
     {
@@ -317,11 +305,84 @@ public class Service implements Serializable
         clearEinAusgabeListe();
         return "index.xhtml?faces-redirect=true";
     }
+    //endregion
 
+    /*******************************************************************************************************************
+     Daten Anzeigen
+     *******************************************************************************************************************/
 
-
-
-
+    //region Daten Laden
+    private List<Anforderungen> anforderungsListe = null;
+    public List<Anforderungen> getAnforderungsListe()
+    {
+        if (anforderungsListe == null)
+        {
+            initAnforderungsListe();
+        }
+        return anforderungsListe;
+    }
+    public void setAnforderungsListe(List<Anforderungen> anforderungsListe)
+    {
+        this.anforderungsListe = anforderungsListe;
+    }
+    public void initAnforderungsListe()
+    {
+        anforderungsListe = em.createQuery("SELECT a FROM Anforderungen a WHERE a.team = :team", Anforderungen.class)
+                .setParameter("team", angemeldetePerson.getTeam())
+                .getResultList();
+    }
+    private Aufgaben aufgabeZuBearbeiten = null;
+    public Aufgaben getAufgabeZuBearbeiten()
+    {
+        return aufgabeZuBearbeiten;
+    }
+    public void setAufgabeZuBearbeiten(Aufgaben aufgabeZuBearbeiten)
+    {
+        this.aufgabeZuBearbeiten = aufgabeZuBearbeiten;
+    }
+    public Class getAufgabZuBearbeitenTyp()
+    {
+        return aufgabeZuBearbeiten.getClass();
+    }
+    private List<Testfaelle> testfallListe = null;
+    public List<Testfaelle> getTestfallListe()
+    {
+        if (testfallListe == null)
+        {
+            initTestfallListe();
+        }
+        return testfallListe;
+    }
+    public void setTestfallListe(List<Testfaelle> testfallListe)
+    {
+        this.testfallListe = testfallListe;
+    }
+    public void initTestfallListe()
+    {
+        testfallListe = em.createQuery("SELECT a FROM Testfaelle a WHERE a.team = :team", Testfaelle.class)
+                .setParameter("team", angemeldetePerson.getTeam())
+                .getResultList();
+    }
+    private List<Testlaeufe> testlaufListe = null;
+    public List<Testlaeufe> getTestlaufListe()
+    {
+        if (testlaufListe == null)
+        {
+            initTestlaufListe();
+        }
+        return testlaufListe;
+    }
+    public void setTestlaufListe (List<Testlaeufe> testlaufListe)
+    {
+        this.testlaufListe = testlaufListe;
+    }
+    public void initTestlaufListe()
+    {
+        testlaufListe = em.createQuery("SELECT a FROM Testlaeufe a WHERE a.team = :team", Testlaeufe.class)
+            .setParameter("team", angemeldetePerson.getTeam())
+            .getResultList();
+    }
+    //endregion
 
     //**************Simulierte Daten werden hier im Konstruktor erstellt (war vor einführung von Datenabnk)*************
     //**************einAusgabeListe muss hier die maximale Anzahl an Felder für String übergaben initieren**************

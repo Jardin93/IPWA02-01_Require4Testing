@@ -37,61 +37,103 @@
             <div class="grid" >
                 <div class="col-2 flex align-items-center justify-content-center" />
                 <div class="col-8 flex align-items-center justify-content-center">
-                    <h:form id="form">
-                        <p:dataView var="product" value="#{dataGridView.products}" rows="12" paginator="true"
-                                    rowsPerPageTemplate="6,12,16"
-                                    paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                    <h:form id="form_Anzeiger" rendered="#{Service.loggedIn}">
+                        <p:dataView var="aufgabe" value="#{Service.aufgabenListe}" rows="12" paginator="true"
+                                    paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                                     gridIcon="pi pi-th-large" listIcon="pi pi-bars">
 
                             <p:dataViewGridItem>
-                                <div class="product-grid-item card border-1">
-                                    <div class="product-grid-item-top">
+                                <p:outputPanel class="aufgaben-grid-item card border-1" rendered="#{Service.sollAngezeigtWerden(aufgabe.getClass())}">
+                                    <div class="aufgaben-grid-item-content">
                                         <div>
-                                            <i class="pi pi-tag product-category-icon"/>
-                                            <span class="product-category">#{product.category}</span>
+                                            <i class="pi pi-tag aufgaben-category-icon"/>
+                                            <span class="aufgaben-category">#{aufgabe.getClass().simpleName}</span>
+                                            <div class="aufgaben-ersteller">Erstellt von: #{aufgabe.ersteller.username}</div>
+                                            <div class="aufgaben-erstellt">Erstellt am: #{aufgabe.date}</div>
                                         </div>
-                                        <span class="product-badge status-#{product.inventoryStatus.name().toLowerCase()}">#{product.inventoryStatus.text}</span>
+                                        <br />
+                                        <div class="aufgaben-name">ID: \##{aufgabe.id} Titel: #{aufgabe.titel}</div>
+                                        <div class="aufgaben-beschreibung" style="border-style: ridge">Beschreibung:<br /> #{aufgabe.beschreibung}</div><br />
+
+                                        <p:outputPanel rendered="#{aufgabe.getClass().simpleName == 'Anforderungen'}" style="border-style: ridge" >
+                                            Liste der Testfälle:<br />
+                                            <h:outputText value="#{Service.anzeigerTestfallTitelListe(aufgabe)}" escape="false" />
+                                        </p:outputPanel>
+
+                                        <p:outputPanel rendered="#{aufgabe.getClass().simpleName == 'Testfaelle'}">
+                                            Zugeortneter Testlauf:
+                                            <h:outputText value="#{Service.anzeigerTestlauf(aufgabe)}" escape="false" />
+                                            <br />
+                                            Zugeortnete Anforderung:
+                                            <h:outputText value="#{Service.anzeigerAnforderung(aufgabe)}" escape="false" />
+                                            <br />
+                                            Last Update:
+                                            <h:outputText value="#{Service.anzeigerLastUpdate(aufgabe)}" escape="false" />
+                                            <br />
+                                            Zugeortnete Status:
+                                            <h:outputText value="#{Service.anzeigerStatus(aufgabe)}" escape="false" />
+                                            <br />
+                                            <div style="border-style: ridge">
+                                                Testschritte:<br />
+                                                <h:outputText value="#{Service.anzeigetTestschritte(aufgabe)}" escape="false" />
+                                            </div>
+                                        </p:outputPanel>
+
+                                        <p:outputPanel rendered="#{aufgabe.getClass().simpleName == 'Testlaeufe'}">
+                                            Zugeortnete Tester:
+                                            <h:outputText value="#{Service.anzeigerTester(aufgabe)}" escape="false" />
+                                            <br />
+                                            Zugeortnete Testfälle:
+                                            <h:outputText value="#{Service.anzeigerTestfallTitelListe(aufgabe)}" escape="false" style="border-style: ridge" />
+                                        </p:outputPanel>
                                     </div>
-                                    <div class="product-grid-item-content">
-                                        <p:graphicImage name="images/product/#{product.image}" library="demo"/>
-                                        <div class="product-name">#{product.name}</div>
-                                        <div class="product-description">#{product.description}</div>
-                                        <p:rating readonly="true" value="#{product.rating}"/>
-                                    </div>
-                                    <div class="product-grid-item-bottom">
-                                        <h:outputText value="#{product.price}" styleClass="product-price">
-                                            <f:convertNumber currencySymbol="$" type="currency"/>
-                                        </h:outputText>
-                                        <p:commandButton type="button"
-                                                         value="Add To Cart"
-                                                         icon="pi pi-shopping-cart"
-                                                         disabled="#{product.inventoryStatus == 'OUTOFSTOCK'}">
-                                        </p:commandButton>
-                                    </div>
-                                </div>
+                                    <br />
+                                </p:outputPanel>
                             </p:dataViewGridItem>
 
                             <p:dataViewListItem>
-                                <div class="product-list-item">
-                                    <p:graphicImage name="demo/images/product/#{product.image}"/>
-                                    <div class="product-list-detail">
-                                        <div class="product-name">#{product.name}</div>
-                                        <div class="product-description">#{product.description}</div>
-                                        <p:rating readonly="true" value="#{product.rating}"/>
-                                        <i class="pi pi-tag product-category-icon"/><span
-                                            class="product-category">#{product.category}</span>
+                                <div class="aufgaben-list-item" style="border-style: solid; margin-bottom: 15px">
+                                    <div class="aufgaben-list-detail">
+                                        <i class="pi pi-tag aufgaben-category-icon"/>
+                                        <span class="aufgaben-category">#{aufgabe.getClass().simpleName}</span>
+                                        <div class="aufgaben-ersteller">Erstellt von: #{aufgabe.ersteller.username}</div>
+                                        <div class="aufgaben-erstellt">Erstellt am: #{aufgabe.date}</div>
                                     </div>
-                                    <div class="product-list-action">
-                                        <h:outputText value="#{product.price}" styleClass="product-price">
-                                            <f:convertNumber currencySymbol="$" type="currency"/>
-                                        </h:outputText>
-                                        <p:commandButton type="button"
-                                                         value="Add To Cart"
-                                                         icon="pi pi-shopping-cart"
-                                                         disabled="#{product.inventoryStatus == 'OUTOFSTOCK'}">
-                                        </p:commandButton>
-                                        <span class="product-badge status-#{product.inventoryStatus.name().toLowerCase()}">#{product.inventoryStatus.text}</span>
-                                    </div>
+                                    <br />
+                                    <div class="aufgaben-name">ID: \##{aufgabe.id} Titel: #{aufgabe.titel}</div>
+                                    <div class="aufgaben-beschreibung" style="border-style: ridge">Beschreibung:<br /> #{aufgabe.beschreibung}</div><br />
+
+                                    <p:outputPanel rendered="#{aufgabe.getClass().simpleName == 'Anforderungen'}" style="border-style: ridge">
+                                        Liste der Testfälle:<br />
+                                        <h:outputText value="#{Service.anzeigerTestfallTitelListe(aufgabe)}" escape="false" />
+                                    </p:outputPanel>
+
+                                    <p:outputPanel rendered="#{aufgabe.getClass().simpleName == 'Testfaelle'}">
+                                        Zugeortneter Testlauf:
+                                        <h:outputText value="#{Service.anzeigerTestlauf(aufgabe)}" escape="false" />
+                                        <br />
+                                        Zugeortnete Anforderung:
+                                        <h:outputText value="#{Service.anzeigerAnforderung(aufgabe)}" escape="false" />
+                                        <br />
+                                        Last Update:
+                                        <h:outputText value="#{Service.anzeigerLastUpdate(aufgabe)}" escape="false" />
+                                        <br />
+                                        Zugeortnete Status:
+                                        <h:outputText value="#{Service.anzeigerStatus(aufgabe)}" escape="false" />
+                                        <br />
+                                        <div style="border-style: ridge">
+                                            Testschritte:<br />
+                                            <h:outputText value="#{Service.anzeigetTestschritte(aufgabe)}" escape="false" />
+                                        </div>
+                                    </p:outputPanel>
+
+                                    <p:outputPanel rendered="#{aufgabe.getClass().simpleName == 'Testlaeufe'}">
+                                        Zugeortnete Tester:
+                                        <h:outputText value="#{Service.anzeigerTester(aufgabe)}" escape="false" />
+                                        <br />
+                                        Zugeortnete Testfälle:
+                                        <h:outputText value="#{Service.anzeigerTestfallTitelListe(aufgabe)}" escape="false" style="border-style: ridge" />
+                                    </p:outputPanel>
                                 </div>
                             </p:dataViewListItem>
                         </p:dataView>

@@ -310,7 +310,6 @@ public class Service implements Serializable
     /*******************************************************************************************************************
      Daten Anzeigen
      *******************************************************************************************************************/
-
     //region Daten Laden
     private List<Anforderungen> anforderungsListe = null;
     public List<Anforderungen> getAnforderungsListe()
@@ -381,6 +380,129 @@ public class Service implements Serializable
         testlaufListe = em.createQuery("SELECT a FROM Testlaeufe a WHERE a.team = :team", Testlaeufe.class)
             .setParameter("team", angemeldetePerson.getTeam())
             .getResultList();
+    }
+    //endregion
+
+    //region DataView
+    public String anzeigerAnforderung(Aufgaben aufgabe)
+    {
+        String s = "";
+        if (aufgabe instanceof Testfaelle)
+        {
+            Anforderungen a = ((Testfaelle) aufgabe).getAnforderung();
+            if (a != null)
+            {
+                s += a.getTitel();
+            }
+        }
+        return s;
+    }
+    public String anzeigerTestlauf(Aufgaben aufgabe)
+    {
+        String s = "";
+        if (aufgabe instanceof Testfaelle)
+        {
+            s += ((Testfaelle) aufgabe).getTestlauf();
+        }
+        return s;
+    }
+    public String anzeigerLastUpdate(Aufgaben aufgabe)
+    {
+        String s = "";
+        if (aufgabe instanceof Testfaelle)
+        {
+            s += ((Testfaelle) aufgabe).getLastUpdate();
+        }
+        return s;
+    }
+    public String anzeigerStatus(Aufgaben aufgabe)
+    {
+        String s = "";
+        if (aufgabe instanceof Testfaelle)
+        {
+            s += ((Testfaelle) aufgabe).getStatusErgebnis();
+        }
+        return s;
+    }
+    public String anzeigetTestschritte(Aufgaben aufgabe)
+    {
+        if (aufgabe instanceof Testfaelle)
+        {
+            String s = ((Testfaelle) aufgabe).getTestschritte();
+            if (s == null) return "";
+            return s.replace("\n","<br />");
+        }
+        return "";
+    }
+    public String anzeigerTester(Aufgaben aufgabe)
+    {
+        String s = "";
+        if (aufgabe instanceof Testlaeufe)
+        {
+            Personen p = ((Testlaeufe) aufgabe).getTester();
+            if (p != null)
+            {
+                s += p.getUsername();
+            }
+        }
+        return s;
+    }
+    public String anzeigerTestfallTitelListe(Aufgaben aufgabe)
+    {
+        String s = "";
+        List<Testfaelle> testfallListe = null;
+        if (aufgabe instanceof Anforderungen)
+        {
+            testfallListe = ((Anforderungen) aufgabe).getTestfall();
+        }
+        if (aufgabe instanceof Testlaeufe)
+        {
+            testfallListe = ((Testlaeufe) aufgabe).getTestfaelle();
+        }
+        if (testfallListe != null)
+        {
+            for (Testfaelle t : testfallListe)
+            {
+                s += t.getTitel();
+                s += "<br />";
+            }
+        }
+        return s;
+    }
+    public boolean sollAngezeigtWerden(Class c)
+    {
+        if (Objects.equals(getRolle(), "Requirements Engineer") && c == Anforderungen.class) return true;
+        if (Objects.equals(getRolle(), "Testmanager") && (c == Testlaeufe.class || c == Testfaelle.class)) return true;
+        if (Objects.equals(getRolle(), "Testfallersteller") && (c == Anforderungen.class || c == Testfaelle.class)) return true;
+        if (Objects.equals(getRolle(), "Tester") && c == Testfaelle.class) return true;
+        return false;
+    }
+    private List<Aufgaben> aufgabenListe;
+
+    public List<Aufgaben> getAufgabenListe() {
+        if (aufgabenListe == null) {
+            initAufgabenListe();
+        }
+        return aufgabenListe;
+    }
+
+    public void initAufgabenListe() {
+        aufgabenListe = em.createQuery("SELECT a FROM Aufgaben a WHERE a.team = :team", Aufgaben.class)
+                .setParameter("team", angemeldetePerson.getTeam())
+                .getResultList();
+    }
+
+    public String aufgabeBearbeiten(Aufgaben aufgabe) {
+        this.aufgabeZuBearbeiten = aufgabe;
+        if (aufgabe instanceof Anforderungen) {
+            return "AnforderungBearbeiten.xhtml?faces-redirect=true";
+        } else if (aufgabe instanceof Testfaelle) {
+            return "TestfallBearbeiten.xhtml?faces-redirect=true";
+        } else if (aufgabe instanceof Testlaeufe) {
+            return "TestlaufBearbeiten.xhtml?faces-redirect=true";
+        } else {
+            return "index.xhtml?faces-redirect=true"; // Oder eine Fehlerseite
+        }
     }
     //endregion
 

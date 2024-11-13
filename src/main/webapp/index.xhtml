@@ -33,17 +33,14 @@
                 </p:menubar>
             </h:form>
         </div><br />
-        <div class="card">
-            <div class="grid" >
-                <div class="col-2 flex align-items-center justify-content-center" />
-                <div class="col-8 flex align-items-center justify-content-center">
+                <div class="align-items-center justify-content-center">
                     <h:form id="form_Anzeiger" rendered="#{Service.loggedIn}">
                         <p:dataView var="aufgabe" value="#{Service.aufgabenListe}" rows="12" paginator="true"
                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
                                     gridIcon="pi pi-th-large" listIcon="pi pi-bars">
 
                             <p:dataViewGridItem>
-                                <p:outputPanel class="aufgaben-grid-item card border-1" rendered="#{Service.sollAngezeigtWerden(aufgabe.getClass())}">
+                                <p:outputPanel class="aufgaben-grid-item card border-1">
                                     <div class="aufgaben-grid-item-content">
                                         <div>
                                             <i class="pi pi-tag aufgaben-category-icon"/>
@@ -83,64 +80,78 @@
                                             Zugeortnete Tester:
                                             <h:outputText value="#{Service.anzeigerTester(aufgabe)}" escape="false" />
                                             <br />
-                                            Zugeortnete Testfälle:
-                                            <h:outputText value="#{Service.anzeigerTestfallTitelListe(aufgabe)}" escape="false" style="border-style: ridge" />
+                                            <div style="border-style: ridge">
+                                                Zugeortnete Testfälle:<br />
+                                                <h:outputText value="#{Service.anzeigerTestfallTitelListe(aufgabe)}" escape="false"/>
+                                            </div>
                                         </p:outputPanel>
+                                        <div>
+                                            <p:commandButton action="#{Service.aufgabeBearbeiten(aufgabe)}"
+                                                             value="Bearbeiten" icon="pi pi-pencil"
+                                                             rendered="#{((Service.angemeldetePerson.role == 'Tester' or Service.angemeldetePerson.role == 'Testfallersteller') and aufgabe.getClass().simpleName == 'Testfaelle')}"
+                                                             />
+                                        </div>
                                     </div>
-                                    <br />
                                 </p:outputPanel>
                             </p:dataViewGridItem>
 
                             <p:dataViewListItem>
-                                <div class="aufgaben-list-item" style="border-style: solid; margin-bottom: 15px">
-                                    <div class="aufgaben-list-detail">
-                                        <i class="pi pi-tag aufgaben-category-icon"/>
-                                        <span class="aufgaben-category">#{aufgabe.getClass().simpleName}</span>
-                                        <div class="aufgaben-ersteller">Erstellt von: #{aufgabe.ersteller.username}</div>
-                                        <div class="aufgaben-erstellt">Erstellt am: #{aufgabe.date}</div>
-                                    </div>
-                                    <br />
-                                    <div class="aufgaben-name">ID: \##{aufgabe.id} Titel: #{aufgabe.titel}</div>
-                                    <div class="aufgaben-beschreibung" style="border-style: ridge">Beschreibung:<br /> #{aufgabe.beschreibung}</div><br />
-
-                                    <p:outputPanel rendered="#{aufgabe.getClass().simpleName == 'Anforderungen'}" style="border-style: ridge">
-                                        Liste der Testfälle:<br />
-                                        <h:outputText value="#{Service.anzeigerTestfallTitelListe(aufgabe)}" escape="false" />
-                                    </p:outputPanel>
-
-                                    <p:outputPanel rendered="#{aufgabe.getClass().simpleName == 'Testfaelle'}">
-                                        Zugeortneter Testlauf:
-                                        <h:outputText value="#{Service.anzeigerTestlauf(aufgabe)}" escape="false" />
-                                        <br />
-                                        Zugeortnete Anforderung:
-                                        <h:outputText value="#{Service.anzeigerAnforderung(aufgabe)}" escape="false" />
-                                        <br />
-                                        Last Update:
-                                        <h:outputText value="#{Service.anzeigerLastUpdate(aufgabe)}" escape="false" />
-                                        <br />
-                                        Zugeortnete Status:
-                                        <h:outputText value="#{Service.anzeigerStatus(aufgabe)}" escape="false" />
-                                        <br />
-                                        <div style="border-style: ridge">
-                                            Testschritte:<br />
-                                            <h:outputText value="#{Service.anzeigetTestschritte(aufgabe)}" escape="false" />
+                                <p:outputPanel class="aufgaben-grid-item card border-1">
+                                    <div class="aufgaben-list-item" style="border-style: solid; margin-bottom: 15px">
+                                        <div class="aufgaben-list-detail">
+                                            <i class="pi pi-tag aufgaben-category-icon"/>
+                                            <span class="aufgaben-category">#{aufgabe.getClass().simpleName}</span>
+                                            <div class="aufgaben-ersteller">Erstellt von: #{aufgabe.ersteller.username}</div>
+                                            <div class="aufgaben-erstellt">Erstellt am: #{aufgabe.date}</div>
                                         </div>
-                                    </p:outputPanel>
-
-                                    <p:outputPanel rendered="#{aufgabe.getClass().simpleName == 'Testlaeufe'}">
-                                        Zugeortnete Tester:
-                                        <h:outputText value="#{Service.anzeigerTester(aufgabe)}" escape="false" />
                                         <br />
-                                        Zugeortnete Testfälle:
-                                        <h:outputText value="#{Service.anzeigerTestfallTitelListe(aufgabe)}" escape="false" style="border-style: ridge" />
-                                    </p:outputPanel>
-                                </div>
+                                        <div class="aufgaben-name">ID: \##{aufgabe.id} Titel: #{aufgabe.titel}</div>
+                                        <div class="aufgaben-beschreibung" style="border-style: ridge">Beschreibung:<br /> #{aufgabe.beschreibung}</div><br />
+
+                                        <p:outputPanel rendered="#{aufgabe.getClass().simpleName == 'Anforderungen'}" style="border-style: ridge">
+                                            Liste der Testfälle:<br />
+                                            <h:outputText value="#{Service.anzeigerTestfallTitelListe(aufgabe)}" escape="false" />
+                                        </p:outputPanel>
+
+                                        <p:outputPanel rendered="#{aufgabe.getClass().simpleName == 'Testfaelle'}">
+                                            Zugeortneter Testlauf:
+                                            <h:outputText value="#{Service.anzeigerTestlauf(aufgabe)}" escape="false" />
+                                            <br />
+                                            Zugeortnete Anforderung:
+                                            <h:outputText value="#{Service.anzeigerAnforderung(aufgabe)}" escape="false" />
+                                            <br />
+                                            Last Update:
+                                            <h:outputText value="#{Service.anzeigerLastUpdate(aufgabe)}" escape="false" />
+                                            <br />
+                                            Zugeortnete Status:
+                                            <h:outputText value="#{Service.anzeigerStatus(aufgabe)}" escape="false" />
+                                            <br />
+                                            <div style="border-style: ridge">
+                                                Testschritte:<br />
+                                                <h:outputText value="#{Service.anzeigetTestschritte(aufgabe)}" escape="false" />
+                                            </div>
+                                        </p:outputPanel>
+
+                                        <p:outputPanel rendered="#{aufgabe.getClass().simpleName == 'Testlaeufe'}">
+                                            Zugeortnete Tester:
+                                            <h:outputText value="#{Service.anzeigerTester(aufgabe)}" escape="false" />
+                                            <br />
+                                            <div style="border-style: ridge">
+                                                Zugeortnete Testfälle:<br />
+                                                <h:outputText value="#{Service.anzeigerTestfallTitelListe(aufgabe)}" escape="false"/>
+                                            </div>
+                                        </p:outputPanel>
+                                        <div>
+                                            <p:commandButton action="#{Service.aufgabeBearbeiten(aufgabe)}"
+                                                             value="Bearbeiten" icon="pi pi-pencil"
+                                                             rendered="#{((Service.angemeldetePerson.role == 'Tester' or Service.angemeldetePerson.role == 'Testfallersteller') and aufgabe.getClass().simpleName == 'Testfaelle')}"
+                                                             />
+                                        </div>
+                                    </div>
+                                </p:outputPanel>
                             </p:dataViewListItem>
                         </p:dataView>
                     </h:form>
                 </div>
-                <div class="col-2 flex align-items-center justify-content-center" />
-            </div>
-        </div>
     </h:body>
 </html>

@@ -144,6 +144,7 @@ public class Service implements Serializable
             em.getTransaction().begin();
             em.persist(anforderung);
             em.getTransaction().commit();
+            aufgabenListeAdd(anforderung);
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback(); // Rollback bei Fehler
@@ -187,33 +188,40 @@ public class Service implements Serializable
         {
             testfall = em.createQuery("SELECT p FROM Testfaelle p WHERE p.titel = :titel AND p.team = :team", Testfaelle.class)
                     .setParameter("titel", einAusgabeListe.get(0))
-                    .setParameter("team", einAusgabeListe.get(1))
+                    .setParameter("team", angemeldetePerson.getTeam())
                     .getSingleResult();
         }catch (Exception e) {}
-        if (testfall == null) {testfall = new Testfaelle();} //wenn nicht existiert, dann neu erzeugen
-        testfall.setTitel(einAusgabeListe.get(0));
-        testfall.setBeschreibung(einAusgabeListe.get(1));
-        testfall.setTeam(angemeldetePerson.getTeam());
-        testfall.setErsteller(angemeldetePerson);
-        for (Anforderungen a : getAnforderungsListe())
-        {
-            if (Objects.equals(a.getTitel(), einAusgabeListe.get(2)))
+        //wenn nicht existiert, dann neu erzeugen
+        if (testfall == null) {
+            testfall = new Testfaelle();
+            testfall.setTitel(einAusgabeListe.get(0));
+            testfall.setBeschreibung(einAusgabeListe.get(1));
+            testfall.setTeam(angemeldetePerson.getTeam());
+            testfall.setErsteller(angemeldetePerson);
+            for (Anforderungen a : getAnforderungsListe())
             {
-                testfall.setAnforderung(a);
-                break;
+                if (Objects.equals(a.getTitel(), einAusgabeListe.get(2)))
+                {
+                    testfall.setAnforderung(a);
+                    break;
+                }
             }
         }
+        //muss immer geupdatet werden
         testfall.setStatusErgebnis(einAusgabeListe.get(3));
         testfall.setTestschritte(einAusgabeListe.get(4));
         try { //Aufgabe speichern
             em.getTransaction().begin();
             em.persist(testfall);
+            em.persist(testfall.getAnforderung());
             em.getTransaction().commit();
+            aufgabenListeAdd(testfall);
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback(); // Rollback bei Fehler
             }
         }
+        initAufgabenListe();
         clearEinAusgabeListe();
         return "index.xhtml?faces-redirect=true";
     }
@@ -233,12 +241,12 @@ public class Service implements Serializable
                 .getResultList();
         return testerListe;
     }
-    private DualListModel<Testfaelle> testfallpicker = null;
-    public DualListModel<Testfaelle> getTestfallpicker() {
+    private DualListModel<String> testfallpicker = null;
+    public DualListModel<String> getTestfallpicker() {
         if (testfallpicker == null) {initTestfallpicker();}
         return testfallpicker;
     }
-    public void setTestfallpicker(DualListModel<Testfaelle> testfallpicker)
+    public void setTestfallpicker(DualListModel<String> testfallpicker)
     {
         this.testfallpicker = testfallpicker;
     }
@@ -247,7 +255,11 @@ public class Service implements Serializable
         List<Testfaelle> source = em.createQuery("SELECT a FROM Testfaelle a WHERE a.team = :team", Testfaelle.class)
                 .setParameter("team", angemeldetePerson.getTeam())
                 .getResultList();
-        testfallpicker = new DualListModel<>(source,new ArrayList<>());
+        List<String> sourceString = new ArrayList<>();
+        for (Testfaelle testfaelle : source) {
+            sourceString.add(testfaelle.getTitel());
+        }
+        testfallpicker = new DualListModel<>(sourceString,new ArrayList<>());
     }
     private List<SelectItem> stringtesterNamensListe = null;
     public List<SelectItem> getStringtesterNamensListe()
@@ -292,16 +304,29 @@ public class Service implements Serializable
                 break;
             }
         }
-        testlauf.setTestfaelle(testfallpicker.getTarget());
+        List<Testfaelle> testfallListe = new ArrayList<>();
+        for (String s : testfallpicker.getTarget())
+        {
+            testfallListe.add(em.createQuery("SELECT t FROM Testfaelle t WHERE t.titel = :titel", Testfaelle.class)
+                    .setParameter("titel", s)
+                    .getSingleResult());
+        }
+        testlauf.setTestfaelle(testfallListe);
         try { //Aufgabe speichern
             em.getTransaction().begin();
             em.persist(testlauf);
+            for (Testfaelle testfaelle : testfallListe)
+            {
+                testfaelle.setTestlauf(testlauf);
+                em.persist(testfaelle);
+            }
             em.getTransaction().commit();
         } catch (Exception e) {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback(); // Rollback bei Fehler
             }
         }
+        initAufgabenListe();
         clearEinAusgabeListe();
         return "index.xhtml?faces-redirect=true";
     }
@@ -402,7 +427,7 @@ public class Service implements Serializable
         String s = "";
         if (aufgabe instanceof Testfaelle)
         {
-            s += ((Testfaelle) aufgabe).getTestlauf();
+            s += ((Testfaelle) aufgabe).getTestlauf().getTitel();
         }
         return s;
     }
@@ -449,7 +474,7 @@ public class Service implements Serializable
     }
     public String anzeigerTestfallTitelListe(Aufgaben aufgabe)
     {
-        String s = "";
+        StringBuilder s = new StringBuilder();
         List<Testfaelle> testfallListe = null;
         if (aufgabe instanceof Anforderungen)
         {
@@ -463,11 +488,12 @@ public class Service implements Serializable
         {
             for (Testfaelle t : testfallListe)
             {
-                s += t.getTitel();
-                s += "<br />";
+                s.append(t.getTitel());
+                s.append("<br />");
             }
         }
-        return s;
+        if (s.isEmpty()) return "";
+        return s.toString();
     }
     public boolean sollAngezeigtWerden(Class c)
     {
@@ -492,14 +518,20 @@ public class Service implements Serializable
                 .getResultList();
     }
 
+    public void aufgabenListeAdd(Aufgaben aufgabe)
+    {
+        this.aufgabenListe.add(aufgabe);
+    }
+
     public String aufgabeBearbeiten(Aufgaben aufgabe) {
         this.aufgabeZuBearbeiten = aufgabe;
-        if (aufgabe instanceof Anforderungen) {
-            return "AnforderungBearbeiten.xhtml?faces-redirect=true";
-        } else if (aufgabe instanceof Testfaelle) {
+        if (aufgabe instanceof Testfaelle) {
+            einAusgabeListe.set(0,aufgabe.getTitel());
+            einAusgabeListe.set(1,aufgabe.getBeschreibung());
+            einAusgabeListe.set(2,((Testfaelle)aufgabe).getAnforderung().getTitel());
+            einAusgabeListe.set(3,((Testfaelle)aufgabe).getStatusErgebnis());
+            einAusgabeListe.set(4,((Testfaelle)aufgabe).getTestschritte());
             return "TestfallBearbeiten.xhtml?faces-redirect=true";
-        } else if (aufgabe instanceof Testlaeufe) {
-            return "TestlaufBearbeiten.xhtml?faces-redirect=true";
         } else {
             return "index.xhtml?faces-redirect=true"; // Oder eine Fehlerseite
         }

@@ -47,7 +47,7 @@
                         <f:selectItems value="#{Service.stringtesterNamensListe}"/>
                     </p:cascadeSelect>
                     <h5>Testfälle</h5>
-                    <p:pickList id="pickList" value="#{Service.testfallpicker}" var="Testfaelle" itemLabel="#{Testfaelle.titel}" itemValue="#{Testfaelle}" />
+                    <p:pickList id="pickList" value="#{Service.testfallpicker}" var="Testfaelle" itemLabel="#{Testfaelle}" itemValue="#{Testfaelle}" />
                     <br />
                     <p:commandButton action="#{Service.TestlaufSpeichern()}" value="Speichern" />
                 </h:form>

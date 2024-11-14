@@ -544,6 +544,6 @@ public class Service implements Serializable
     {
         einAusgabeListe = new ArrayList<>();
         // Initialisiere die Liste mit der Anzahl der benötigten Elementen
-        for (int i = 0; i < 10; i++) einAusgabeListe.add("");
+        for (int i = 0; i < 5; i++) einAusgabeListe.add("");
     }
 }
